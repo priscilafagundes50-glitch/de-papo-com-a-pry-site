@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Área do Professor — De Papo com a PRY</title>
+  <meta name="description" content="Painel do professor: ver inscrições e provas enviadas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{ --navy:#0b1b3c; --red:#e11d2e; --bg:#f7f7fb; }
+    html,body{ background:var(--bg); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+    .card{ background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:1.25rem; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+    .btn{ display:inline-flex; align-items:center; gap:.6rem; padding:.7rem 1rem; border-radius:.7rem; font-weight:700; transition:.2s; }
+    .btn-primary{ background:#e11d2e; color:#fff; }
+    .btn-secondary{ background:#0b1b3c; color:#fff; }
+    table{ width:100%; border-collapse:collapse; }
+    th,td{ border-bottom:1px solid #eee; padding:.6rem .5rem; text-align:left; font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <header class="mb-6">
+      <h1 class="text-3xl font-extrabold">Área do Professor</h1>
+      <p class="text-slate-600">Consulte inscrições e provas. (Proteção simples; para segurança avançada, usamos autenticação no Apps Script)</p>
+    </header>
+
+    <section class="card p-6">
+      <div class="flex flex-wrap items-center gap-3">
+        <input id="code" type="password" placeholder="Código de acesso" class="border rounded px-3 py-2">
+        <button id="entrar" class="btn btn-secondary">Entrar</button>
+        <button id="atualizar" class="btn btn-primary" disabled>Atualizar</button>
+      </div>
+      <p id="status" class="text-sm text-slate-600 mt-2">Insira o código e clique Entrar.</p>
+    </section>
+
+    <section class="grid md:grid-cols-2 gap-6 mt-6">
+      <div class="card p-6">
+        <h2 class="text-xl font-bold">Inscrições</h2>
+        <div class="overflow-auto mt-3">
+          <table id="tabInsc"><thead><tr><th>Data</th><th>Nome</th><th>Email</th><th>Telefone</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+      <div class="card p-6">
+        <h2 class="text-xl font-bold">Provas</h2>
+        <div class="overflow-auto mt-3">
+          <table id="tabProvas"><thead><tr><th>Data</th><th>Prova</th><th>Nota</th><th>Acertos</th><th>Nome</th><th>Email</th><th>Telefone</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="mt-16 text-center text-sm opacity-80 py-8">
+    © Pastora Priscila Fagundes / De Papo com a PRY — Todos os direitos reservados.
+  </footer>
+
+  <script>
+    const DASH_URL = "COLE_AQUI_SUA_URL_DO_APPS_SCRIPT"; // mesma URL /exec
+    const statusEl = document.getElementById('status');
+    const btnIn = document.getElementById('entrar');
+    const btnUp = document.getElementById('atualizar');
+    const codeEl = document.getElementById('code');
+
+    async function fetchData() {
+      const url = DASH_URL + "?type=dashboard&code=" + encodeURIComponent(localStorage.getItem('PRY_prof_code')||'');
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('Erro ao carregar');
+      return res.json();
+    }
+
+    function fillTable(sel, rows) {
+      const tb = document.querySelector(sel + " tbody");
+      tb.innerHTML='';
+      rows.forEach(r=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = r.map(c=>`<td>${c}</td>`).join('');
+        tb.appendChild(tr);
+      });
+    }
+
+    async function load() {
+      try {
+        const data = await fetchData();
+        fillTable('#tabInsc', data.inscricoes);
+        fillTable('#tabProvas', data.provas);
+        statusEl.textContent = "Dados carregados.";
+      } catch(e) { statusEl.textContent = "Falha ao carregar (verifique código)."; }
+    }
+
+    btnIn.addEventListener('click', ()=>{
+      localStorage.setItem('PRY_prof_code', codeEl.value.trim());
+      btnUp.disabled = false;
+      load();
+    });
+    btnUp.addEventListener('click', load);
+  </script>
+</body>
+</html>

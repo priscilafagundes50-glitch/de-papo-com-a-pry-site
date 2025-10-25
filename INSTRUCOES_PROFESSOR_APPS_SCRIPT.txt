@@ -1,0 +1,68 @@
+
+APPS SCRIPT — Inscrições, Provas e Dashboard do Professor
+
+1) No Google Sheets, crie uma planilha com duas abas:
+   - Inscricoes (A: Data, B: Nome, C: Email, D: Telefone)
+   - Provas     (A: Data, B: Prova, C: Nota, D: Acertos, E: Nome, F: Email, G: Telefone, H: JSON Respostas)
+
+2) Extensões → Apps Script → cole o código abaixo. Ajuste PASSWORD.
+   Depois: Implantar → Implantar como aplicativo da Web → "Qualquer pessoa" → copie a URL /exec.
+   Use essa URL nos HTMLs (SCRIPT_URL e DASH_URL).
+
+const PASSWORD = "defina-um-codigo-seguro-aqui";
+
+function doPost(e){
+  try{
+    var data = JSON.parse(e.postData.contents);
+    var t = String(data._type||"");
+
+    if(t === "signup"){
+      var sh = getSheet_("Inscricoes");
+      sh.appendRow([new Date(), data.nome||"", data.email||"", data.telefone||""]);
+      return text_("OK");
+    }
+
+    if(t === "answers_score"){
+      var sh2 = getSheet_("Provas");
+      var json = JSON.stringify(data);
+      sh2.appendRow([new Date(), data.prova||"", data.nota||"", data.acertos||"", data.nome||"", data.email||"", data.telefone||"", json]);
+      return text_("OK");
+    }
+
+    return text_("UNKNOWN");
+  }catch(err){
+    return text_("ERROR: "+err);
+  }
+}
+
+function doGet(e){
+  var type = e.parameter.type||"";
+  if(type === "dashboard"){
+    var code = e.parameter.code||"";
+    if(code !== PASSWORD) return ContentService.createTextOutput(JSON.stringify({error:"unauthorized"})).setMimeType(ContentService.MimeType.JSON);
+
+    var inscr = readSheet_("Inscricoes");
+    var provas = readSheet_("Provas");
+    return ContentService.createTextOutput(JSON.stringify({inscricoes:inscr, provas:provas})).setMimeType(ContentService.MimeType.JSON);
+  }
+  return text_("UP");
+}
+
+function getSheet_(name){
+  var ss = SpreadsheetApp.getActive();
+  var sh = ss.getSheetByName(name);
+  if(!sh) sh = ss.insertSheet(name);
+  return sh;
+}
+
+function readSheet_(name){
+  var sh = getSheet_(name);
+  var vals = sh.getDataRange().getValues();
+  // Se sua primeira linha é cabeçalho, comente a próxima linha
+  // vals.shift();
+  return vals.map(function(r){
+    return r.map(function(c){ return c===null? "": c; });
+  });
+}
+
+function text_(s){ return ContentService.createTextOutput(s).setMimeType(ContentService.MimeType.TEXT); }

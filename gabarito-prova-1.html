@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gabarito — Prova 1 (Governo do Espírito)</title>
+  <meta name="description" content="Gabarito detalhado com versículos completos, exegese e hermenêutica.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{ --navy:#0b1b3c; --red:#e11d2e; --bg:#f7f7fb; }
+    html,body{ background:var(--bg); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+    .card{ background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:1.25rem; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+    .exegese{ background:#f9fafb; border:1px solid #e5e7eb; border-radius:.8rem; padding:1rem; }
+  </style>
+</head>
+<body>
+  <div class="max-w-5xl mx-auto px-6 py-10">
+    <header class="mb-4">
+      <h1 class="text-3xl font-extrabold">Gabarito — Prova 1 (Governo do Espírito)</h1>
+      <p class="text-slate-600">Versículos completos, exegese e hermenêutica para estudo.</p>
+    </header>
+
+    <main class="space-y-6">
+      <div id="lista"></div>
+    </main>
+  </div>
+
+  <footer class="mt-16 text-center text-sm opacity-80 py-8">
+    © Pastora Priscila Fagundes / De Papo com a PRY — Todos os direitos reservados.
+  </footer>
+
+  <script>
+    const EXEGESE = {
+  "q1": {
+    "versiculo": "Romanos 14:17",
+    "texto": "Porque o Reino de Deus não é comida nem bebida, mas justiça, e paz, e alegria no Espírito Santo.",
+    "exegese": "Basileia (reino) enfatiza governo; Paulo contrasta ritos externos com a vida no Espírito.",
+    "hermeneutica": "Aplicação prática: priorizar transformação interior e comunhão no Espírito.",
+    "midrash": "Bereshit Rabbah 12:9",
+    "livro": "A Noiva Silenciada Vol. 2",
+    "citacao": "O governo do Espírito não é emocional, é essencial. — Pastora Priscila Fagundes"
+  },
+  "q2": {
+    "versiculo": "Gálatas 5:22-23",
+    "texto": "Mas o fruto do Espírito é amor, alegria, paz, longanimidade, benignidade, bondade, fidelidade, mansidão, domínio próprio...",
+    "exegese": "Lista de virtudes como evidência da ação do Espírito em contraste com as obras da carne.",
+    "hermeneutica": "Disciplina espiritual forma caráter semelhante a Cristo nas relações cotidianas.",
+    "midrash": "Midrash Tehillim 1",
+    "livro": "Caráter Cristão",
+    "citacao": "Caráter não é emoção, é escolha guiada pelo Espírito. — Pastora Priscila Fagundes"
+  },
+  "q3": {
+    "versiculo": "João 16:13",
+    "texto": "Quando vier, porém, o Espírito da verdade, ele vos guiará a toda a verdade...",
+    "exegese": "O Parákletos conduz ao entendimento progressivo da revelação de Cristo.",
+    "hermeneutica": "Dependência do Espírito para discernir e aplicar a Palavra nas decisões.",
+    "midrash": "Talmud Bavli, Berakhot 55a (sabedoria e direção)",
+    "livro": "Governo do Espírito (Estudos)",
+    "citacao": "A verdade não grita, guia. — Pastora Priscila Fagundes"
+  }
+};
+    const GABARITO = { q1:'A', q2:'A', q3:'A', q4:'A', q5:'A', q6:'A', q7:'A', q8:'A', q9:'A', q10:'A', q11:'A', q12:'A', q13:'A', q14:'A', q15:'A', q16:'A', q17:'A', q18:'A', q19:'A', q20:'A' }; // ajuste conforme seu gabarito
+
+    function bloco(i, correta, d){
+      return `
+      <article class="card p-5">
+        <h2 class="font-bold">Questão ${i} — Correta: <span class="text-[var(--red)]">${correta}</span></h2>
+        <div class="exegese mt-3">
+          ${d && d.versiculo?`<p><strong>${d.versiculo}</strong></p>`:''}
+          ${d && d.texto?`<blockquote class="italic mt-1">“${d.texto}”</blockquote>`:''}
+          ${d && d.exegese?`<p class="mt-2"><strong>Exegese:</strong> ${d.exegese}</p>`:''}
+          ${d && d.hermeneutica?`<p class="mt-1"><strong>Hermenêutica:</strong> ${d.hermeneutica}</p>`:''}
+          ${d && d.midrash?`<p class="mt-1"><strong>Midrash/Talmud:</strong> ${d.midrash}</p>`:''}
+          ${d && d.livro?`<p class="mt-1"><strong>Livro (sua autoria):</strong> ${d.livro}</p>`:''}
+          ${d && d.citacao?`<p class="mt-1 opacity-80">“${d.citacao}”</p>`:''}
+        </div>
+      </article>`;
+    }
+
+    const cont = document.getElementById('lista');
+    for(let i=1;i<=20;i++){
+      const k='q'+i; const correta = GABARITO[k]; const d = EXEGESE[k]||null;
+      cont.insertAdjacentHTML('beforeend', bloco(i, correta, d));
+    }
+  </script>
+</body>
+</html>

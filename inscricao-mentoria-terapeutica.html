@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inscrição — Mentoria Terapêutica · De Papo com a PRY</title>
+  <meta name="description" content="Inscrição para a Mentoria Terapêutica — nome, e-mail e telefone.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{ --navy:#0b1b3c; --red:#e11d2e; }
+    html,body{ background:linear-gradient(135deg,#0b1b3c,#122756); color:#fff; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+    .card{ background:#fff; color:#111; border-radius:1.25rem; box-shadow:0 14px 45px rgba(0,0,0,.18); border:1px solid rgba(0,0,0,.06); }
+    .field{ border:1px solid #e5e7eb; border-radius:.9rem; padding:.9rem 1rem; width:100%; }
+    .btn{ display:inline-flex; align-items:center; gap:.6rem; padding:.9rem 1.2rem; border-radius:999px; font-weight:700; transition:.2s; }
+    .btn:hover{ transform:translateY(-1px); opacity:.96; }
+    .btn-primary{ background:#e11d2e; color:#fff; }
+    .btn-secondary{ background:#0b1b3c; color:#fff; }
+    .ok,.fail{ display:none; margin-top:1rem; padding:1rem; border-radius:.8rem; }
+    .ok{ background:#ecfdf5; color:#065f46; border:1px solid #10b98155; }
+    .fail{ background:#fef2f2; color:#7f1d1d; border:1px solid #ef444455; }
+  </style>
+</head>
+<body>
+  <div class="max-w-5xl mx-auto px-6 py-12">
+    <header class="text-center">
+      <h1 class="text-4xl font-extrabold">Inscrição — Mentoria Terapêutica</h1>
+      <p class="opacity-90 mt-2">“Você foi criada para florescer.”</p>
+    </header>
+
+    <main class="card mt-8 p-6 md:p-10">
+      <form id="formInsc" class="mt-2 grid md:grid-cols-2 gap-6">
+        <label class="block md:col-span-2">
+          <span class="font-semibold">Nome completo *</span>
+          <input required name="nome" type="text" class="field" placeholder="Seu nome">
+        </label>
+        <label class="block">
+          <span class="font-semibold">E-mail *</span>
+          <input required name="email" type="email" class="field" placeholder="voce@exemplo.com">
+        </label>
+        <label class="block">
+          <span class="font-semibold">Telefone (WhatsApp) *</span>
+          <input required name="telefone" type="tel" class="field" placeholder="(DDD) 90000-0000" pattern="^\+?\d[\d\s\-()]{7,}$" title="Informe um número válido">
+        </label>
+        <label class="block md:col-span-2">
+          <span class="inline-flex items-start gap-2"><input type="checkbox" required name="consent"> Concordo em ser contatada(o) sobre esta mentoria.</span>
+        </label>
+        <div class="md:col-span-2 flex flex-wrap gap-3 pt-2">
+          <button type="submit" class="btn btn-primary">Enviar inscrição</button>
+          <a href="./prova-1-governo-do-espirito.html" class="btn btn-secondary">Ir ao checklist</a>
+        </div>
+        <div id="ok" class="ok md:col-span-2">Inscrição enviado! Você pode prosseguir para o checklist.</div>
+        <div id="fail" class="fail md:col-span-2">Não foi possível enviar agora. Tente novamente.</div>
+      </form>
+    </main>
+  </div>
+
+  <footer class="mt-16 text-center text-sm opacity-80 py-8">
+    © Pastora Priscila Fagundes / De Papo com a PRY — Todos os direitos reservados.
+  </footer>
+
+  <script>
+    const SCRIPT_URL = "COLE_AQUI_SUA_URL_DO_APPS_SCRIPT";
+    const ok = document.getElementById('ok');
+    const fail = document.getElementById('fail');
+    function serialize(form){ const fd=new FormData(form), obj={}; for(const [k,v] of fd.entries()) obj[k]=v; obj._type='signup'; return obj; }
+    document.getElementById('formInsc').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      ok.style.display='none'; fail.style.display='none';
+      const data = serialize(e.target);
+      try{ 
+        await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+        localStorage.setItem('PRY_enrolled', JSON.stringify({ email:data.email, nome:data.nome, telefone:data.telefone, at:new Date().toISOString() }));
+        ok.style.display='block';
+      }catch(err){ console.error(err); fail.style.display='block'; }
+    });
+  </script>
+</body>
+</html>
