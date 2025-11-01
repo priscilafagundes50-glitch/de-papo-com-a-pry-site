@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loja & Música — De Papo com a PRY</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a1b32;--card:#132a4a;--text:#eef3fb;--muted:#a8bbd9;--brand:#ffcc33;--border:rgba(255,255,255,.08)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#0a1b32,#143055);color:var(--text);font:16px/1.6 Inter,system-ui,Segoe UI,Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 20px}
+header{position:sticky;top:0;background:rgba(10,27,50,.65);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:5}
+nav a{color:var(--text);text-decoration:none;margin-right:14px}
+h1{font-weight:800;font-size:clamp(24px,3.5vw,40px);margin:18px 0}
+.section{margin:24px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card img,.card video{width:100%;display:block}
+.card .p{padding:12px}
+.btn{display:inline-block;margin-top:8px;padding:10px 14px;border-radius:10px;background:var(--brand);color:#0b172b;text-decoration:none;font-weight:700}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid var(--border);font-size:12px;margin-left:6px;color:var(--muted)}
+.hero{position:relative;width:100%;height:600px;overflow:hidden}
+.hero video{width:100%;height:100%;object-fit:cover}
+.hero .title{position:absolute;inset:0;display:grid;place-items:center}
+.hero .box{background:rgba(0,0,0,.45);border:1px solid var(--border);padding:16px 20px;border-radius:16px;text-align:center}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <nav>
+    <a href="index.html">Início</a>
+    <a href="apresentacao.html">Mentoria</a>
+    <a href="apostila-governo-do-espirito.html">Apostila</a>
+    <a href="prova-1.html">Prova</a>
+    <a href="gabarito-prova-1.html">Gabarito</a>
+    <a href="sentidos.html">5 Sentidos</a>
+    <a href="venda-curso.html">Curso</a>
+    <a href="professor.html">Professor</a>
+    <a href="loja-musica.html"><strong>Loja & Música</strong></a>
+    <select id="langSwitcher"><option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option><option value="it">IT</option><option value="fr">FR</option><option value="de">DE</option><option value="ar">AR</option><option value="he">HE</option></select>
+  </nav>
+</div></header>
+
+<section class="hero">
+  <video id="heroVideo" autoplay muted loop preload="auto">
+    <source src="mp4/banner-loja-e-musica-1920x600.mp4" type="video/mp4">
+  </video>
+  <div class="title"><div class="box">
+    <h1>Loja & Música <span class="badge">oficial</span></h1>
+    <div style="color:var(--muted)">Livros, apostilas e faixas autorais para ouvir na plataforma.</div>
+  </div></div>
+</section>
+
+<main class="wrap">
+  <section class="section">
+    <h2>Produtos (PDF / Livro)</h2>
+    <div id="prod-grid" class="grid"></div>
+  </section>
+
+  <section class="section">
+    <h2>Músicas (MP4 / Spotify)</h2>
+    <div id="music-grid" class="grid"></div>
+  </section>
+
+  <footer class="section" style="color:var(--muted);border-top:1px solid var(--border);padding-top:12px">
+    © 2025 Pastora Priscila Fagundes — Mentoria Terapêutica Pastoral. Desenvolvido por K&amp;C Designer Visual.
+  </footer>
+</main>
+
+<script>
+// Carrega itens do "Admin" (localStorage). Se não existir, usa exemplos.
+const cfg = JSON.parse(localStorage.getItem("admin_cfg")||"{}");
+
+// hero vídeo (se definido no admin)
+if(cfg.banner_loja){ document.querySelector("#heroVideo source").src = cfg.banner_loja; document.getElementById("heroVideo").load(); }
+
+// Produtos
+const prod = cfg.produtos || [
+  {titulo:"A Noiva Silenciada — Vol. 1", capa:"img/aula1-thumb.jpg", link:"pdf/noiva-silenciada-v1.pdf"},
+  {titulo:"A Noiva Silenciada — Vol. 2", capa:"img/aula2-thumb.jpg", link:"pdf/noiva-silenciada-v2.pdf"},
+  {titulo:"Governo do Espírito — Apostila", capa:"img/capa-site-apostila.jpg", link:"pdf/apostila-governo-do-espirito.pdf"}
+];
+const prodGrid = document.getElementById('prod-grid');
+prod.forEach(p=>{
+  prodGrid.insertAdjacentHTML('beforeend', `
+    <article class="card">
+      <img src="${p.capa}" alt="${p.titulo}">
+      <div class="p">
+        <div style="font-weight:700">${p.titulo}</div>
+        <a class="btn" href="${p.link}" target="_blank">Abrir</a>
+      </div>
+    </article>
+  `);
+});
+
+// Músicas
+const music = cfg.musicas || [
+  {titulo:"Tema — Mentoria", mp4:"mp4/musica-tema.mp4"},
+  {titulo:"Faixa Spotify (exemplo)", spotify:"https://open.spotify.com/"}
+];
+const musicGrid = document.getElementById('music-grid');
+music.forEach(m=>{
+  let media = m.mp4
+    ? `<video controls><source src="${m.mp4}" type="video/mp4"></video>`
+    : `<div class="p"><a class="btn" href="${m.spotify}" target="_blank">Ouvir no Spotify</a></div>`;
+  musicGrid.insertAdjacentHTML('beforeend', `
+    <article class="card">
+      ${media}
+      <div class="p"><div style="font-weight:700">${m.titulo}</div></div>
+    </article>
+  `);
+});
+</script>
+
+<script src="i18n/langs.js"></script>
+<script src="i18n/i18n.js"></script>
+</body>
+</html>

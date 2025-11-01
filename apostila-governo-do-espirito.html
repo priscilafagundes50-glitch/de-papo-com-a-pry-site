@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Apostila · Governo do Espírito</title>
+
+  <!-- Paleta/variáveis básicas -->
+  <style>
+    :root{
+      --bg:#0a1b32; --bg2:#0e2747; --card:#132b4a; --card2:#0f223d;
+      --text:#f1f5f9; --muted:#cbd5e1; --border:#274466;
+      --accent:#e11d48; /* vermelho */
+      --warn:#f59e0b;   /* amarelo  */
+    }
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#0a1b32 0%, #102c54 100%);color:var(--text);font-family:Inter, "Noto Sans Arabic","Noto Sans Hebrew", system-ui, -apple-system, "Segoe UI", Roboto, Arial, Helvetica, sans-serif}
+    a{color:var(--text);text-decoration:none}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px 20px}
+    /* NAV */
+    header.nav{position:sticky;top:0;z-index:50;background:rgba(10,27,50,.65);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+    .bar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{font-weight:700;letter-spacing:.3px}
+    .nav a{margin:0 8px;color:var(--text)}
+    #langSwitcher{padding:6px 10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:#fff}
+
+    /* HERO / BANNER SUPERIOR */
+    .hero-banner{position:relative;width:100%;height:600px;overflow:hidden}
+    .hero-banner video{width:100%;height:100%;object-fit:cover}
+    .hero-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;text-align:center;padding:20px;background:rgba(0,0,0,.4);border-radius:20px}
+
+    /* Seções */
+    h2.section-title{margin:24px 0 8px}
+    p.lead{color:var(--muted)}
+
+    /* Grid de cards (2 colunas desktop, 1 no mobile) */
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px;margin:18px 0}
+    .card{background:linear-gradient(180deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;gap:16px;align-items:flex-start}
+    .thumb{width:180px;height:240px;border-radius:12px;object-fit:cover;border:1px solid var(--border);background:#0c203b}
+    .card h3{margin:0 0 6px}
+    .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;font-weight:600}
+    .btn.red{background:var(--accent)}
+    .btn.yellow{background:var(--warn);color:#111827}
+    .note{font-size:.9rem;color:var(--muted)}
+
+    /* Rodapé */
+    footer{border-top:1px solid var(--border);margin-top:28px}
+    .foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+    .social{display:flex;gap:10px;align-items:center}
+    .badge{padding:6px 10px;border:1px solid var(--border);border-radius:10px;color:var(--muted)}
+    /* ===== Ocultar UI intrusiva do Google Translate (sem mudar estética) ===== */
+    .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame{display:none !important}
+    .goog-te-gadget{font-size:0 !important;line-height:0 !important} /* esconde o widget nativo */
+    body{top:0 !important}
+  </style>
+
+  <!-- Fontes multilíngues -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+Hebrew:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- 🔁 GOOGLE TRANSLATE (carregado mas escondido; controlamos pelo seletor do topo) -->
+  <div id="google_translate_element" style="position:absolute;left:-9999px;"></div>
+  <script>
+    function googleTranslateElementInit(){
+      new google.translate.TranslateElement({
+        pageLanguage: 'pt',
+        includedLanguages: 'pt,en,es,it,fr,de,ar,he',
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <!-- Sincronizar nosso seletor com o Google Translate -->
+  <script>
+    // Mapa dos códigos do seletor -> Google
+    const MAP = { pt:'pt', en:'en', es:'es', it:'it', fr:'fr', de:'de', ar:'ar', he:'he' };
+
+    function setLangViaGoogle(code){
+      const target = MAP[code] || 'pt';
+      const iframe = document.querySelector('iframe.goog-te-menu-frame');
+      // Aguarda widget montar
+      if(!iframe){
+        setTimeout(()=>setLangViaGoogle(code), 200);
+        return;
+      }
+      const inner = iframe.contentWindow.document;
+      const options = inner.querySelectorAll('.goog-te-menu2-item span.text');
+      options.forEach(opt=>{
+        const label = (opt.innerText || '').trim().toLowerCase();
+        // compara por código ou nome
+        if(label === target || label.includes('(' + target + ')')) opt.click();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const sel = document.getElementById('langSwitcher');
+      if(sel){
+        sel.addEventListener('change', e => setLangViaGoogle(e.target.value));
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="wrap bar">
+      <div class="brand">De Papo com a PRY</div>
+      <nav class="nav">
+        <a href="index.html">Início</a>
+        <a href="apresentacao.html">Mentoria</a>
+        <a href="apostila-governo-do-espirito.html">Apostila</a>
+        <a href="prova-1.html">Prova</a>
+        <a href="gabarito-prova-1.html">Gabarito</a>
+        <a href="sentidos.html">5 Sentidos</a>
+        <a href="venda-curso.html">Curso</a>
+        <a href="professor.html">Professor</a>
+        <a href="loja-musica.html">Loja & Música</a>
+
+        <!-- Seletor que comanda o Google Translate -->
+        <select id="langSwitcher" aria-label="Idioma">
+          <option value="pt" selected>PT</option>
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+          <option value="it">IT</option>
+          <option value="fr">FR</option>
+          <option value="de">DE</option>
+          <option value="ar">AR</option>
+          <option value="he">HE</option>
+        </select>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO / BANNER SUPERIOR (vídeo 1920×600) -->
+  <section class="hero">
+    <section class="hero-banner">
+      <video autoplay muted loop playsinline preload="auto">
+       <source src="mp4/banner-governo-1920x600.mp4" type="video/mp4">
+        Seu navegador não suporta vídeos em HTML5.
+      </video>
+
+      <!-- Título e subtítulo por cima do vídeo -->
+      <div class="hero-text">
+        <h1>Apostila: Governo do Espírito</h1>
+        <p>Mentoria Terapêutica Pastoral com a Pastora Priscila Fagundes — De Papo com a PRY</p>
+      </div>
+    </section>
+  </section>
+
+  <main class="wrap">
+    <!-- SOBRE O ESTUDO -->
+    <h2 class="section-title">Sobre este estudo</h2>
+    <p class="lead">Conteúdo base da Formação em Terapia Cristã — módulo Governo do Espírito.</p>
+
+    <!-- CARDS DAS AULAS -->
+    <section class="grid">
+      <!-- Aula 1 -->
+      <article class="card">
+        <img class="thumb" src="img/aula1-thumb.jpg" alt="Aula 1 — Capa (180×240)">
+        <div>
+          <h3>Aula 1 — O Governo do Espírito e a mente</h3>
+          <p>Audição, mente renovada e obediência.</p>
+          <div class="actions">
+            <a class="btn red" href="https://open.spotify.com/" target="_blank" rel="noopener">Ouvir no Spotify</a>
+            <a class="btn yellow" href="#" title="Compra via Mercado Pago">Comprar PDF (R$ 29,90)</a>
+          </div>
+          <div class="note">Após a compra, seu download fica disponível (máx. 2 vezes).</div>
+        </div>
+      </article>
+
+      <!-- Aula 2 -->
+      <article class="card">
+        <img class="thumb" src="img/aula2-thumb.jpg" alt="Aula 2 — Capa (180×240)">
+        <div>
+          <h3>Aula 2 — Disciplina da alma e afetos ordenados</h3>
+          <p>Ritmos espirituais, intercessão e caráter.</p>
+          <div class="actions">
+            <a class="btn red" href="https://open.spotify.com/" target="_blank" rel="noopener">Ouvir no Spotify</a>
+            <a class="btn yellow" href="#" title="Compra via Mercado Pago">Comprar PDF (R$ 29,90)</a>
+          </div>
+          <div class="note">Após a compra, seu download fica disponível (máx. 2 vezes).</div>
+        </div>
+      </article>
+
+      <!-- Aula 3 -->
+      <article class="card">
+        <img class="thumb" src="img/aula3-thumb.jpg" alt="Aula 3 — Capa (180×240)">
+        <div>
+          <h3>Aula 3 — Alinhamento espiritual e prática</h3>
+          <p>Discernimento para decisões e serviço.</p>
+          <div class="actions">
+            <a class="btn red" href="https://open.spotify.com/" target="_blank" rel="noopener">Ouvir no Spotify</a>
+            <a class="btn yellow" href="#" title="Compra via Mercado Pago">Comprar PDF (R$ 29,90)</a>
+          </div>
+          <div class="note">Após a compra, seu download fica disponível (máx. 2 vezes).</div>
+        </div>
+      </article>
+
+      <!-- Aula 4 -->
+      <article class="card">
+        <img class="thumb" src="img/aula4-thumb.jpg" alt="Aula 4 — Capa (180×240)">
+        <div>
+          <h3>Aula 4 — Trabalho final e debate</h3>
+          <p>Síntese bíblica aplicada e entrega do texto.</p>
+          <div class="actions">
+            <a class="btn red" href="https://open.spotify.com/" target="_blank" rel="noopener">Ouvir no Spotify</a>
+            <a class="btn yellow" href="#" title="Compra via Mercado Pago">Comprar PDF (R$ 29,90)</a>
+          </div>
+          <div class="note">Após a compra, seu download fica disponível (máx. 2 vezes).</div>
+        </div>
+      </article>
+
+      <!-- Aula Extra (Ezer) -->
+      <article class="card">
+        <img class="thumb" src="img/aula-extra-thumb.jpg" alt="Aula Extra — Capa (180×240)">
+        <div>
+          <h3>Aula Extra — Ezer: A mulher em aliança</h3>
+          <p>Identidade e vocação feminina sob o Governo do Espírito.</p>
+          <div class="actions">
+            <a class="btn red" href="https://open.spotify.com/" target="_blank" rel="noopener">Ouvir no Spotify</a>
+            <a class="btn yellow" href="#" title="Compra via Mercado Pago">Comprar PDF (R$ 29,90)</a>
+          </div>
+          <div class="note">Após a compra, seu download fica disponível (máx. 2 vezes).</div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer>
+    <div class="wrap foot">
+      <div class="badge">© 2025 Todos os direitos reservados · Pastora Priscila Fagundes</div>
+      <div class="badge">Cuidar da alma é restaurar o Governo do Espírito.</div>
+      <div class="badge">Site oficial da Mentoria Terapêutica Pastoral · Pastora Priscila Fagundes</div>
+      <div class="social">
+        <a class="badge" href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+        <a class="badge" href="https://wa.me" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="badge" href="https://youtube.com" target="_blank" rel="noopener">YouTube</a>
+      </div>
+    </div>
+<!-- 🌍 TRADUTOR GOOGLE AUTOMÁTICO -->
+<div id="google_translate_element" style="position:fixed;top:10px;right:10px;z-index:99999;"></div>
+
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'pt',
+      includedLanguages: 'pt,en,es,it,fr,de,ar,he',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: false
+    }, 'google_translate_element');
+  }
+</script>
+
+<script type="text/javascript"
+  src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+</script>
+<!-- ✅ TRADUÇÃO ATIVADA -->
+  </footer>
+</body>
+</html>

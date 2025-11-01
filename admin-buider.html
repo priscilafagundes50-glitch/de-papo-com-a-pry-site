@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<title>Admin Builder — De Papo com a PRY</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+:root{--bg:#0a1b32;--bg2:#0f2546;--card:#122a4e;--text:#eef3ff;--mut:#a9bbd9;--ok:#18c37d;--warn:#ffb020;--bord:#2b4268}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);
+font:15px/1.5 Inter,system-ui,Segoe UI,Roboto,Arial}
+header{position:sticky;top:0;padding:14px 18px;background:rgba(10,27,50,.8);backdrop-filter:blur(8px);
+border-bottom:1px solid var(--bord);font-weight:700}
+.wrap{max-width:1080px;margin:22px auto;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--bord);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+label{font-size:12px;color:var(--mut)}
+input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--bord);background:#0d2140;color:#fff}
+textarea{min-height:88px}
+.btn{display:inline-block;padding:10px 14px;border-radius:12px;border:1px solid var(--bord);background:#163260;color:#fff;text-decoration:none;cursor:pointer}
+.ok{background:var(--ok)} .warn{background:var(--warn);color:#1a2a3f}
+.flex{display:flex;gap:10px;flex-wrap:wrap} .right{justify-content:flex-end}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#lista .item{background:#0f2345;border:1px dashed var(--bord);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center}
+.handle{cursor:grab;font-weight:700;color:#8fb1ff}
+.small{font-size:12px;color:var(--mut)}
+.preview{display:grid;grid-template-columns:160px 1fr;gap:14px}
+.thumb{width:160px;height:200px;border-radius:10px;border:1px solid var(--bord);background:#0d2140;display:flex;align-items:center;justify-content:center}
+.badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--bord);color:var(--mut)}
+</style>
+</head>
+<body>
+<header>Admin Builder</header>
+<div class="wrap">
+
+  <!-- Login -->
+  <div id="login" class="card">
+    <div class="row">
+      <div>
+        <label>Senha</label>
+        <input id="pass" type="password" placeholder="Digite a senha">
+        <div class="small">Padrão: <b>PRI25</b></div>
+      </div>
+      <div style="align-self:end"><button class="btn ok" onclick="login()">Entrar</button></div>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div id="app" class="card" style="display:none">
+    <div class="flex right">
+      <button class="btn" onclick="importarJSON()">Importar catálogo (.json)</button>
+      <button class="btn ok" onclick="baixarLoja()">Baixar loja-musica.html</button>
+      <button class="btn ok" onclick="exportarZIP()">Exportar PACOTE (.zip)</button>
+      <button class="btn warn" onclick="limpar()">Limpar</button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Adicionar Card</h3>
+      <div class="row-3">
+        <div>
+          <label>Tipo</label>
+          <select id="tipo" onchange="ajustaPreco()">
+            <option value="apostila" selected>Apostila (R$ 29,90)</option>
+            <option value="livro">Livro (R$ 170,00)</option>
+            <option value="musica">Música/Vídeo (opcional preço)</option>
+          </select>
+        </div>
+        <div><label>Título</label><input id="titulo" placeholder="A Noiva Silenciada — Vol. 1"></div>
+        <div><label>Preço</label><input id="preco" type="number" step="0.01" value="29.90"></div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Capa (JPG/PNG) → /img</label>
+          <input id="capafile" type="file" accept=".jpg,.jpeg,.png" onchange="nome(this,'capa')">
+          <input id="capa" placeholder="capa-exemplo.jpg">
+        </div>
+        <div>
+          <label>PDF (apenas Apostila) → /pdf</label>
+          <input id="pdffile" type="file" accept=".pdf" onchange="nome(this,'pdf')">
+          <input id="pdf" placeholder="apostila-exemplo.pdf">
+        </div>
+      </div>
+
+      <div class="row">
+        <div><label>MP4 (apenas Música/Vídeo) → /mp4</label>
+          <input id="mp4file" type="file" accept=".mp4" onchange="nome(this,'mp4')">
+          <input id="mp4" placeholder="musica.mp4">
+        </div>
+        <div><label>Spotify (link do episódio/track)</label><input id="spotify" placeholder="https://open.spotify.com/..."></div>
+      </div>
+
+      <div class="row">
+        <div><label>Link de compra (Mercado Pago / Clify / Stripe / Qiwi)</label><input id="compra" placeholder="https://pagamento..."></div>
+        <div><label>Descrição (curta)</label><input id="desc" placeholder="Resumo em ~7 minutos no Spotify."></div>
+      </div>
+
+      <div class="flex right" style="margin-top:8px">
+        <button class="btn ok" onclick="adicionar()">Adicionar card</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Lista (arraste para ordenar)</h3>
+      <div id="lista"></div>
+      <div class="small" style="margin-top:8px">Dica: segure o identificador <span class="badge">☰</span> e arraste.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const PASS="PRI25"; const KEY="builder_catalogo_v3";
+const FILES={img:{},pdf:{},mp4:{}};
+function login(){ if(document.getElementById('pass').value!==PASS){alert("Senha incorreta.");return;}
+  document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';render(); }
+function getS(){ try{return JSON.parse(localStorage.getItem(KEY))||{itens:[]}}catch(e){return{itens:[]}} }
+function setS(s){ localStorage.setItem(KEY,JSON.stringify(s)); render(); }
+function ajustaPreco(){ const t=gid('tipo').value; gid('preco').value=(t==='livro'?'170.00':(t==='apostila'?'29.90':'')); }
+function gid(id){return document.getElementById(id)}
+function nome(inp,target){ if(!inp.files||!inp.files[0])return; const f=inp.files[0]; gid(target).value=f.name;
+  const bucket=target==='pdf'?'pdf':(target==='mp4'?'mp4':'img'); FILES[bucket][f.name]=f; }
+function adicionar(){
+  const t=gid('tipo').value, titulo=gid('titulo').value.trim(), preco=gid('preco').value, capa=gid('capa').value.trim(),
+        pdf=gid('pdf').value.trim(), mp4=gid('mp4').value.trim(), spot=gid('spotify').value.trim(),
+        compra=gid('compra').value.trim(), desc=gid('desc').value.trim();
+  if(!titulo||!capa){alert("Título e Capa são obrigatórios.");return;}
+  if(t==='apostila' && !pdf){alert("Para Apostila selecione o PDF.");return;}
+  const s=getS(); s.itens.push({id:'i_'+Date.now(),tipo:t,titulo,preco:preco?Number(preco):null,capa, pdf:pdf||null, mp4:mp4||null, spotify:spot||null, compra:compra||null, desc});
+  setS(s); ['titulo','capa','pdf','mp4','spotify','compra','desc'].forEach(id=>gid(id).value=''); gid('capafile').value=null; gid('pdffile').value=null; gid('mp4file').value=null; ajustaPreco();
+}
+function remover(id){ const s=getS(); s.itens=s.itens.filter(x=>x.id!==id); setS(s); }
+function render(){
+  const s=getS(), L=gid('lista'); if(!L)return; L.innerHTML='';
+  s.itens.forEach((it,idx)=>{
+    const div=document.createElement('div'); div.className='item'; div.draggable=true; div.dataset.idx=idx;
+    div.innerHTML=`<div class="handle">☰</div>
+      <div class="preview">
+        <div class="thumb"><small>${it.capa||'—'}</small></div>
+        <div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="font-weight:700">${it.titulo}</div>
+            <span class="badge">${it.tipo.toUpperCase()}</span>
+            ${it.preco?`<span class="badge">R$ ${it.preco.toFixed(2)}</span>`:''}
+          </div>
+          <div class="small">${it.desc||''}</div>
+          <div class="small">Campos: ${it.pdf?'PDF · ':''}${it.mp4?'MP4 · ':''}${it.spotify?'Spotify · ':''}${it.compra?'Compra':''}</div>
+          <div class="flex" style="margin-top:8px">
+            <button class="btn" onclick="editar('${it.id}')">Editar</button>
+            <button class="btn" onclick="duplicar('${it.id}')">Duplicar</button>
+            <button class="btn warn" onclick="remover('${it.id}')">Remover</button>
+          </div>
+        </div>
+      </div>`;
+    // drag
+    div.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',idx);});
+    div.addEventListener('dragover',e=>{e.preventDefault();});
+    div.addEventListener('drop',e=>{
+      e.preventDefault(); const from=Number(e.dataTransfer.getData('text/plain')); const to=Number(div.dataset.idx);
+      const s=getS(); const [moved]=s.itens.splice(from,1); s.itens.splice(to,0,moved); setS(s);
+    });
+    L.appendChild(div);
+  });
+}
+function editar(id){
+  const s=getS(); const it=s.itens.find(x=>x.id===id); if(!it)return;
+  gid('tipo').value=it.tipo; gid('titulo').value=it.titulo; gid('preco').value=it.preco??''; gid('capa').value=it.capa;
+  gid('pdf').value=it.pdf??''; gid('mp4').value=it.mp4??''; gid('spotify').value=it.spotify??''; gid('compra').value=it.compra??''; gid('desc').value=it.desc??'';
+  // ao salvar, substitui o antigo
+  remover(id);
+}
+function duplicar(id){
+  const s=getS(); const src=s.itens.find(x=>x.id===id); if(!src)return;
+  const copy=JSON.parse(JSON.stringify(src)); copy.id='i_'+Date.now(); s.itens.push(copy); setS(s);
+}
+function limpar(){ if(confirm('Limpar tudo?')){ localStorage.removeItem(KEY); location.reload(); } }
+function importarJSON(){
+  const i=document.createElement('input'); i.type='file'; i.accept='application/json';
+  i.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader();
+    r.onload=()=>{ localStorage.setItem(KEY,r.result); render(); }; r.readAsText(f); };
+  i.click();
+}
+function baixarLoja(){
+  const s=getS();
+  const html=geraLojaHTML(s.itens);
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='loja-musica.html'; a.click();
+}
+async function exportarZIP(){
+  const s=getS(); const zip=new JSZip();
+  zip.file('data/catalogo.json', JSON.stringify(s,null,2));
+  const img=zip.folder('img'), pdf=zip.folder('pdf'), mp4=zip.folder('mp4');
+  for(const [n,f] of Object.entries(FILES.img)) img.file(n,f);
+  for(const [n,f] of Object.entries(FILES.pdf)) pdf.file(n,f);
+  for(const [n,f] of Object.entries(FILES.mp4)) mp4.file(n,f);
+  const blob=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pacote-site.zip'; a.click();
+}
+
+/* --------- GERADOR DA PÁGINA LOJA --------- */
+function geraLojaHTML(itens){
+  const cards=itens.map(it=>{
+    const preco = it.preco!=null ? `R$ ${it.preco.toFixed(2)}` : 'Gratuito';
+    const spotify = it.spotify ? `<iframe style="width:100%;height:152px;border-radius:12px;border:0; margin-top:8px" src="https://open.spotify.com/embed${it.spotify.replace(/^https:\/\/open\.spotify\.com/,'')}" loading="lazy"></iframe>` : '';
+    const midia = it.mp4 ? `<video controls style="width:100%;margin-top:8px"><source src="mp4/${it.mp4}" type="video/mp4"></video>` : '';
+    const compraBtn = it.compra ? `<a class="btn ok" href="${it.compra}" target="_blank" rel="noopener">Comprar</a>` : '';
+    const pdfInfo = it.tipo==='apostila' && it.pdf ? `<div class="small">Arquivo: <code>pdf/${it.pdf}</code></div>` : '';
+    return `
+      <div class="card">
+        <div class="grid">
+          <div><img src="img/${it.capa}" alt="${it.titulo}" style="width:100%;max-width:260px;border-radius:14px;border:1px solid #2b4268"></div>
+          <div>
+            <h3 style="margin:0 0 6px 0">${it.titulo}</h3>
+            <div class="small" style="margin-bottom:6px">Tipo: ${it.tipo.toUpperCase()} · <b>${preco}</b></div>
+            <p>${it.desc||''}</p>
+            ${spotify}
+            ${midia}
+            ${pdfInfo}
+            <div class="flex" style="margin-top:10px">${compraBtn}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('\n');
+
+  return `<!DOCTYPE html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loja & Música — De Papo com a PRY</title>
+<style>
+:root{--bg:#0a1b32;--bg2:#0f2546;--card:#122a4e;--text:#eef3ff;--mut:#a9bbd9;--ok:#18c37d;--bord:#2b4268}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font:15px/1.5 Inter,system-ui,Segoe UI,Roboto,Arial}
+header{position:sticky;top:0;background:rgba(10,27,50,.7);border-bottom:1px solid var(--bord);backdrop-filter:blur(8px);padding:14px 18px;font-weight:700}
+.wrap{max-width:1080px;margin:22px auto;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--bord);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.grid{display:grid;grid-template-columns:260px 1fr;gap:16px}
+.btn{display:inline-block;padding:10px 14px;border-radius:12px;border:1px solid var(--bord);background:var(--ok);color:#0f1b2e;text-decoration:none}
+.small{font-size:12px;color:var(--mut)}
+</style>
+</head><body>
+<header>Loja & Música</header>
+<div class="wrap">
+  <h2 style="margin-top:0">Produtos e Faixas</h2>
+  ${cards || '<div class="card">Sem itens ainda.</div>'}
+</div>
+</body></html>`;
+}
+</script>
+</body>
+</html>
