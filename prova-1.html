@@ -3,131 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prova 1 — Governo do Espírito | De Papo com a PRY</title>
+  <title>Prova 1 — Governo do Espírito</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Confete -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
   <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Roboto, sans-serif;
-      background-color: #0b1f33;
-      color: #fff;
-    }
-
-    .hero {
-      position: relative;
-      width: 100%;
-      height: 42vh;
-      min-height: 260px;
-      max-height: 600px;
-      overflow: hidden;
-      border-radius: 14px;
-      margin: 16px auto;
-    }
-    .hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      filter: brightness(0.9);
-    }
-
-    .page-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
-    .page-title {
-      margin: 14px 0 6px;
-      font-size: clamp(22px, 4vw, 34px);
-      font-weight: 800;
-      color: #fff;
-      text-align: center;
-    }
-
-    .content {
-      background-color: #102544;
-      border-radius: 14px;
-      padding: 30px;
-      margin-top: 20px;
-      line-height: 1.6;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-    }
-
-    .question {
-      background-color: #142d54;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-
-    .question strong {
-      color: #ffcc66;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 14px;
-      margin-top: 40px;
-      padding: 15px;
-      color: #ccc;
-    }
-
-    a.button {
-      display: inline-block;
-      padding: 10px 18px;
-      background-color: #ffcc66;
-      color: #0b1f33;
-      font-weight: bold;
-      text-decoration: none;
-      border-radius: 6px;
-      margin-top: 12px;
-      transition: 0.3s;
-    }
-    a.button:hover {
-      background-color: #ffd98f;
-    }
+    body { background:#0a1a3c; color:white; font-family:sans-serif; }
+    main { max-width:900px; margin:30px auto; padding:20px; background:#102454; border-radius:12px; }
+    h1 { text-align:center; margin-bottom:10px; }
+    .q { margin:18px 0; padding:12px; background:#132a5b; border-radius:8px; }
+    .btn { padding:12px 18px; background:#ff4d4d; border:none; border-radius:8px; cursor:pointer; color:white; font-size:18px; margin-top:22px; width:100%; }
+    #resultado { margin-top:25px; padding:20px; background:#0c1f45; border-radius:10px; font-size:19px; }
+    .section-title { margin-bottom:18px; }
   </style>
 </head>
 
 <body>
+  <main>
+    <h1>Prova 1 — Governo do Espírito</h1>
+    <p style="text-align:center;">Cada questão vale <b>0,5</b> (20 × 0,5 = 10). Mínimo para aprovação: <b>7,0</b>.</p>
 
-  <!-- Banner de capa -->
-  <div class="page-wrap">
-    <section class="hero">
-      <img src="img/banner-prova-1.jpg" alt="Prova 1 — Governo do Espírito">
-    </section>
-    <h1 class="page-title">Prova 1 — Governo do Espírito</h1>
-  </div>
+    <form id="quiz">
+      <!-- Auto-preenchidas com modelinho -->
+      <!-- Depois você troca os enunciados e alternativas se desejar -->
 
-  <!-- Conteúdo da prova -->
-  <div class="page-wrap">
-    <div class="content">
-      <p>Esta prova faz parte da <strong>Mentoria Terapêutica Internacional — De Papo com a PRY</strong>, com a Pastora Priscila Fagundes.</p>
+      <!-- 1 a 20 -->
+      ${Array.from({length:20}, (_,i)=>`
+      <div class="q">
+        <p><b>${i+1})</b> [Enunciado da questão ${i+1}]</p>
+        <label><input type="radio" name="q${i+1}" value="A"> Alternativa A</label><br>
+        <label><input type="radio" name="q${i+1}" value="B"> Alternativa B</label><br>
+        <label><input type="radio" name="q${i+1}" value="C"> Alternativa C</label>
+      </div>`).join('')}
+    </form>
 
-      <div class="question">
-        <strong>1.</strong> O que significa “andar em Espírito” segundo Gálatas 5:16?
-      </div>
+    <button type="button" id="corrigir" class="btn">Corrigir prova</button>
+    <div id="resultado" style="display:none;"></div>
+  </main>
 
-      <div class="question">
-        <strong>2.</strong> Como a disciplina da alma contribui para o alinhamento com o Espírito Santo?
-      </div>
+<script>
+// Gabarito padrão — trocamos depois conforme suas perguntas
+const gabarito = {
+ q1:'A', q2:'B', q3:'C', q4:'A', q5:'B',
+ q6:'C', q7:'A', q8:'B', q9:'C', q10:'A',
+ q11:'B', q12:'C', q13:'A', q14:'B', q15:'C',
+ q16:'A', q17:'B', q18:'C', q19:'A', q20:'B'
+};
 
-      <div class="question">
-        <strong>3.</strong> Explique a diferença entre discernimento espiritual e emoção religiosa.
-      </div>
+function confete(tipo){
+  const count = tipo==='alta'?150:tipo==='media'?90:40;
+  const defaults = {spread: 70, ticks: 200, gravity: 0.9};
+  confetti({particleCount: count, startVelocity: 45, origin: {x: 0.2, y: 0.1}, ...defaults});
+  confetti({particleCount: count, startVelocity: 45, origin: {x: 0.8, y: 0.1}, ...defaults});
+}
 
-      <div class="question">
-        <strong>4.</strong> De que forma a obediência à voz de Deus reflete maturidade espiritual?
-      </div>
+document.getElementById("corrigir").addEventListener("click", () => {
+  let acertos = 0;
 
-      <a class="button" href="gabarito-prova-1.html">Ver gabarito</a>
-    </div>
-  </div>
+  for(const q in gabarito){
+    const marcado = document.querySelector(input[name="${q}"]:checked);
+    if(marcado && marcado.value === gabarito[q]) acertos++;
+  }
 
-  <footer>
-    © Pastora Priscila Fagundes — Mentoria Terapêutica Internacional  
-    <br>De Papo com a PRY
-  </footer>
+  const nota = acertos * 0.5;
+  const res = document.getElementById("resultado");
+
+  res.style.display = "block";
+  res.innerHTML =
+    `Você acertou <b>${acertos}</b> de 20 questões.<br>
+     Nota final: <b>${nota.toFixed(1)}</b><br><br>` +
+    (nota >= 9.5 ? "🎓 Nota Excelente! Jesus está te capacitando!" :
+     nota >= 7.0 ? "✅ Aprovado! Continue firme no Espírito!" :
+     nota >= 5.0 ? "⚠ Estude mais um pouco e tente novamente!" :
+                   "🙏 Não desista! O Espírito Santo te guia ao crescimento!");
+
+  if (nota >= 9.5) confete("alta");
+  else if (nota >= 7.0) confete("media");
+  else if (nota >= 5.0) confete("baixa");
+});
+</script>
 
 </body>
 </html>
